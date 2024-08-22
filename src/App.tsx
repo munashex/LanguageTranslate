@@ -1,10 +1,13 @@
-import Translate from "./components/Translate"
+import Translate from "./components/Translate" 
+import Navbar from "./components/Navbar" 
+
 
 const App = () => {
 
   return (
     <div>
-    <Translate/>
+    <Navbar/>
+    <Translate/> 
     </div>
   )
 } 

@@ -2,15 +2,55 @@ import React, { useState, ChangeEvent } from 'react';
 import { TbArrowsExchange2 } from 'react-icons/tb';
 import { IoIosArrowDown, IoIosArrowUp } from 'react-icons/io';
 import { AiOutlineSound } from "react-icons/ai";
-import { FaMicrophone} from "react-icons/fa";
+import { FaMicrophone } from "react-icons/fa";
 import { languages } from '../data/language';
-import { TranslateResponse } from '../types';
 import axios from 'axios';
 import { CgPlayStopO } from "react-icons/cg";
 
+
+interface TranslateResponse {
+  data: {
+    translatedText: string;
+  };
+}
+
+// SpeechRecognition types
+interface SpeechRecognitionEvent extends Event {
+  results: SpeechRecognitionResultList;
+}
+
+interface SpeechRecognitionResultList {
+  [index: number]: SpeechRecognitionResult;
+  length: number;
+}
+
+interface SpeechRecognitionResult {
+  [index: number]: SpeechRecognitionAlternative;
+  length: number;
+}
+
+interface SpeechRecognitionAlternative {
+  transcript: string;
+  confidence: number;
+}
+
+// Add SpeechRecognition interface
+interface SpeechRecognition extends EventTarget {
+  continuous: boolean;
+  interimResults: boolean;
+  lang: string;
+  onresult: (event: SpeechRecognitionEvent) => void;
+  onend: () => void;
+  onstart: () => void;
+  onaudiostart: () => void;
+  start: () => void;
+  stop: () => void;
+}
+
 declare global {
   interface Window {
-    webkitSpeechRecognition: any;
+    webkitSpeechRecognition: new () => SpeechRecognition;
+    SpeechRecognition: new () => SpeechRecognition;
   }
 }
 
@@ -59,7 +99,7 @@ const Translate: React.FC = () => {
         formData,
         {
           headers: {
-            'X-Rapidapi-Key': 'dbd149b11cmsh0a8085e0c99eba0p115b16jsne187ecc0b7ac',
+            'X-Rapidapi-Key': import.meta.env.VITE_API_KEY,
             'X-Rapidapi-Host': 'text-translator2.p.rapidapi.com',
             'Content-Type': 'multipart/form-data',
           },
@@ -83,7 +123,6 @@ const Translate: React.FC = () => {
     setText(event.target.value);
   };
 
-  // Handle speech recognition for source language
   const handleSpeechRecognition = () => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
@@ -91,7 +130,7 @@ const Translate: React.FC = () => {
       return;
     }
 
-    const recognition = new SpeechRecognition();
+    const recognition: SpeechRecognition = new SpeechRecognition();
     recognition.lang = source_language;
     recognition.interimResults = false;
 
@@ -119,7 +158,6 @@ const Translate: React.FC = () => {
     recognition.start();
   };
 
-  // Handle text-to-speech for translated text
   const handleSpeechSynthesis = () => {
     if (!translation) {
       alert("Nothing to speak. Please translate text first.");
@@ -174,9 +212,9 @@ const Translate: React.FC = () => {
               onClick={handleSpeechRecognition}
             >
               {isRecording ? (
-                <CgPlayStopO  size={24} color="white"  className="animate-pulse"/> // Show this icon when recording
+                <CgPlayStopO size={24} color="white" className="animate-pulse" />
               ) : isListening ? (
-                <FaMicrophone size={24} color="green" /> // Show this icon when listening
+                <FaMicrophone size={24} color="green" />
               ) : (
                 <AiOutlineSound size={24} color="white" />
               )}
@@ -200,6 +238,8 @@ const Translate: React.FC = () => {
         </div>
       </div>
 
+      {error && <div className="text-red-500 mt-2 text-center">{error}</div>}
+
       {/* Language selection dropdowns */}
       <div className="absolute top-48 md:top-52 w-full overflow-y-auto">
         {openLeftLanguages && (
@@ -211,7 +251,7 @@ const Translate: React.FC = () => {
                 </h1>
               </div>
             ))}
-          </div>
+          </div> 
         )}
       </div>
 
@@ -233,4 +273,3 @@ const Translate: React.FC = () => {
 };
 
 export default Translate;
-

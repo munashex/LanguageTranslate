@@ -99,7 +99,7 @@ const Translate: React.FC = () => {
         formData,
         {
           headers: {
-            'X-Rapidapi-Key': import.meta.env.VITE_API_KEY,
+            'X-Rapidapi-Key': 'dbd149b11cmsh0a8085e0c99eba0p115b16jsne187ecc0b7ac',
             'X-Rapidapi-Host': 'text-translator2.p.rapidapi.com',
             'Content-Type': 'multipart/form-data',
           },
